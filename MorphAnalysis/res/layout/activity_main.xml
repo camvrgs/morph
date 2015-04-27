@@ -1,0 +1,78 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:orientation="vertical"	>
+
+    <LinearLayout
+        android:id="@+id/search_form" 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		>
+	
+	<EditText
+	    android:id="@+id/edit_message"
+	    android:layout_width="0dp"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="4"
+	    android:hint="@string/edit_message"
+	    android:minHeight="75dp"
+	    android:paddingLeft="25dp"
+	    />
+
+	<Button 
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="@string/button_send"
+	    android:onClick="sendMessage"
+	    android:layout_weight="1"
+	    android:minHeight="75dp"
+	    android:minWidth="50dp"
+	    />
+	
+	</LinearLayout>
+	
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_form"
+        android:layout_marginTop="10dp" >
+	
+		<ScrollView
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:scrollbars="vertical"
+		    android:fillViewport="true">
+	
+		   	<RelativeLayout
+		        android:layout_width="fill_parent"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_height="wrap_content"
+		        android:orientation="vertical" >
+
+		        <TableLayout
+		            android:id="@+id/forms_table"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content">
+		        </TableLayout>
+	        
+		        <TextView
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_below="@id/forms_table"
+		            android:layout_marginBottom="20dp"
+		            android:layout_marginLeft="20dp"
+		            android:layout_marginRight="20dp"
+		            android:layout_marginTop="30dp"
+		            android:text="@string/info"
+		            android:textColor="#9e9e9e"
+		            android:textIsSelectable="true" />
+		        
+    		</RelativeLayout>
+		</ScrollView>
+        
+    </FrameLayout>
+
+</RelativeLayout>

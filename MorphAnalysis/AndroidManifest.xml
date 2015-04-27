@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.cameronvargas.app.morphanalysis"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="16" />
+
+	<uses-permission android:name="android.permission.INTERNET" /> 
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.cameronvargas.app.morphanalysis.MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            
+            <intent-filter>
+		        <action android:name="android.intent.action.SEND" />
+		        <category android:name="android.intent.category.DEFAULT" />
+		        <data android:mimeType="text/plain" />
+    		</intent-filter>
+        </activity>
+        
+        <activity
+            android:name="com.cameronvargas.app.morphanalysis.DsiplayMessageActivity"
+            android:label="@string/title_activity_dsiplay_message"
+            android:parentActivityName="com.cameronvargas.app.morphanalysis.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.cameronvargas.app.morphanalysis.MainActivity" />
+        </activity>
+        
+        <uses-library android:required="false" android:name="com.sec.android.app.multiwindow" />
+		<meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />
+		<meta-data android:name="com.sec.android.multiwindow.DEFAULT_SIZE_W" android:value="632dp" />
+		<meta-data android:name="com.sec.android.multiwindow.DEFAULT_SIZE_H" android:value="598dp" />
+		<meta-data android:name="com.sec.android.multiwindow.MINIMUM_SIZE_W" android:value="632dp" />
+		<meta-data android:name="com.sec.android.multiwindow.MINIMUM_SIZE_H" android:value="598dp" />
+    </application>
+
+</manifest>

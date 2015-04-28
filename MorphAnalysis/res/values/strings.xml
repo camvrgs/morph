@@ -9,5 +9,9 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_dsiplay_message">Query Result</string>
     <string name="info">Built using The Tower of Babel project\'s etymological and morphalogical database tools.\nFind more here: http://starling.rinet.ru/</string>
-
+	
+    <string name="popup_copy">Copy</string>
+    <string name="popup_dictionary">Dictionary</string>
+    <string name="popup_search">Search</string>
+    
 </resources>

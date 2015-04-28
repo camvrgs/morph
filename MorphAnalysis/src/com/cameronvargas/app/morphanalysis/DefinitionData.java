@@ -1,25 +1,45 @@
 package com.cameronvargas.app.morphanalysis;
 
-public class DefinitionData {
-	private boolean isHeader;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+
+public class DefinitionData implements Parcelable {
+	private int isHeader;	// change to int?
 	private String data;
 
-	DefinitionData(boolean h, String d) {
+	DefinitionData(int h, String d) {
 		setHeader(h);
 		setData(d);
 	}
 
-	DefinitionData(String d) {
-		setHeader(false);
+	DefinitionData(boolean b, String d) {
+		setHeader(b);
 		setData(d);
+	}
+	
+	DefinitionData(String d) {
+		this(0, d);
 	}
 
 	public boolean isHeader() {
-		return isHeader;
+		if (getHeader() == 1){
+			return true;
+		} else{
+			return false;
+		}
 	}
 
-	public void setHeader(boolean isHeader) {
-		this.isHeader = isHeader;
+	public void setHeader(int is) {
+		this.isHeader = is;
+	}
+	
+	public int getHeader() {
+		return isHeader;
+	}
+	
+	public void setHeader(boolean is) {
+		this.isHeader = is ? 1 : 0;
 	}
 
 	public String getData() {
@@ -42,4 +62,33 @@ public class DefinitionData {
 	private String removeExtras(String d) {
 		return d.replace("\'", "").replace("\"", "");
 	}
+	
+	
+	// Parcelable interface
+		public DefinitionData(Parcel in) {
+	        // This order must match the order in writeToParcel()
+			setHeader(in.readInt());
+			setData(in.readString());
+	    }
+
+	    public void writeToParcel(Parcel out, int flags) {
+	        // must match the Question(Parcel) constructor
+	        out.writeInt(getHeader());
+	        out.writeString(getData());
+	    }
+
+	    // 
+	    public int describeContents() {
+	        return 0;
+	    }
+
+	    // 
+	    public static final Parcelable.Creator<DefinitionData> CREATOR = new Parcelable.Creator<DefinitionData>() {
+	        public DefinitionData createFromParcel(Parcel in) {
+	            return new DefinitionData(in);
+	        }
+	        public DefinitionData[] newArray(int size) {
+	            return new DefinitionData[size];
+	        }
+	    };
 }

@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
 	// CONSTANTS
 	public final static String EXTRACTED_DOC = "com.cameronvargas.app.morphanalysis.MESSAGE";
 	public final static String URL_DEST = "http://starling.rinet.ru/cgi-bin/morph.cgi?flags=endnnnnn&root=config&word=";
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -105,7 +105,7 @@ public class MainActivity extends Activity {
 	}
 
 	public class urlParseThread extends AsyncTask<String, Integer, Document> {
-		private ArrayList<String> elem = new ArrayList<String>();
+		private ArrayList<DefinitionTable> elem = new ArrayList<DefinitionTable>();
 		private ProgressDialog progressDialog;
 
 		public Document doInBackground(String... params) {
@@ -130,29 +130,86 @@ public class MainActivity extends Activity {
 						Node node = text.get(i).nextSibling();
 						if (node instanceof TextNode) {
 							TextNode txt = (TextNode) node;
-							elem.add(txt.text());
+							if(txt.text().contains(":")){
+								int colon = txt.text().indexOf(":");
+								DefinitionData dh = new DefinitionData(true, txt.text().substring(0, colon));
+								DefinitionData dd = new DefinitionData(false, txt.text().substring(colon+1, txt.text().length()-1));
+								DefinitionTable dt = new DefinitionTable(2);
+								
+								dt.pushData(dh);
+								dt.pushData(dd);
+								
+								elem.add(dt);
+								
+							}
+							else{
+								DefinitionData dh = new DefinitionData(true, txt.text());
+								DefinitionTable dt = new DefinitionTable();
+								
+								dt.pushData(dh);
+								
+								elem.add(dt);
+							}
 						}
 					} else {
 						if (text.get(i).tag().getName() == "p"
 								|| text.get(i).tag().getName() == "h2"
 								|| text.get(i).tag().getName() == "h3") {
-							elem.add(text.get(i).text());
+							
+							if(text.get(i).text().contains(":")){
+								int colon = text.get(i).text().indexOf(":");
+								DefinitionData dh = new DefinitionData(true, text.get(i).text().substring(0, colon));
+								DefinitionData dd = new DefinitionData(false, text.get(i).text().substring(colon+1, text.get(i).text().length()-1));
+								DefinitionTable dt = new DefinitionTable(2);
+								
+								dt.pushData(dh);
+								dt.pushData(dd);
+								
+								elem.add(dt);
+								
+							}
+							else{
+							
+								DefinitionData dh = new DefinitionData(true, text.get(i).text());
+								DefinitionTable dt = new DefinitionTable();
+								
+								dt.pushData(dh);
+								
+								elem.add(dt);
+							}
+							
 						} else {
 							if (text.get(i).tag().getName() == "table") {
-
+										
 								int tdim = text.get(i)
 										.select("tr:first-child > th").size();
-								String tsize = Integer.toString(tdim);
+								
+								DefinitionTable dt = new DefinitionTable(tdim);
+								DefinitionData dd;
+								
+								Elements table = text.get(i).select("th, td");
+								for (int j = 0; j < table.size(); j++) {
+									if(table.get(j).tag().getName() == "th"){
+										dd = new DefinitionData(true, table.get(j).text());
+									} else {
+										dd = new DefinitionData(false, table.get(j).text());
+									}
+									dt.pushData(dd);
+								}
+								
+								elem.add(dt);
+								
+								//String tsize = Integer.toString(tdim);
 
-								elem.add("<table:" + tsize + ">");
-
+								//elem.add("<table:" + tsize + ">");
+								/*
 								Elements table = text.get(i).select("th, td");
 								for (int j = 0; j < table.size(); j++) {
 									elem.add(table.get(j).text());
 								}
 
 								elem.add("</table>");
-
+								*/
 							} else {
 								// elem.add(text.get(i).text());
 							}
@@ -170,19 +227,24 @@ public class MainActivity extends Activity {
 		public void onPreExecute() {
 			super.onPreExecute();
 			progressDialog = ProgressDialog.show(MainActivity.this,
-					"Please Wait", "Loading...");
+					"Please Wait", "Searching for data...", true, false);
 		}
 
 		public void onPostExecute(Document result) {
 			if (result != null) {
 				// ((EditText)findViewById(R.id.edit_message)).setText(out);
-
-				String[] out = elem.toArray(new String[elem.size()]);
+				
+				DefinitionTable[] out = new DefinitionTable[elem.size()];
+				for(int i=0; i<elem.size(); i++){
+					out[i] = elem.get(i);
+				}
+				
+				//String[] out = elem.toArray(new String[elem.size()]);
 				// for(int i=0; i<out.length; i++){ System.out.println(out[i]);
 				// }
 				Intent intent = new Intent(MainActivity.this,
 						DsiplayMessageActivity.class);
-				intent.putExtra(EXTRACTED_DOC, out);
+				intent.putParcelableArrayListExtra(EXTRACTED_DOC, elem);
 				startActivity(intent);
 			} else {
 				((EditText) findViewById(R.id.edit_message)).setText("Error");

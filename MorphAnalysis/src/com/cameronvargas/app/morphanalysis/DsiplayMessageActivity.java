@@ -16,11 +16,16 @@ import com.cameronvargas.app.morphanalysis.R.layout;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
@@ -34,16 +39,19 @@ import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
+import android.widget.ShareActionProvider;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class DsiplayMessageActivity extends Activity {
+	private ShareActionProvider mShareActionProvider;
 	
 	private enum DisplaySizes{
 		DEFINITION(15),
@@ -67,7 +75,6 @@ public class DsiplayMessageActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		setContentView(R.layout.activity_dsiplay_message);
 		// Show the Up button in the action bar.
 		setupActionBar();
@@ -75,6 +82,8 @@ public class DsiplayMessageActivity extends Activity {
 
 		Intent intent = getIntent();
 		ArrayList<DefinitionTable> elem = intent.getParcelableArrayListExtra(MainActivity.EXTRACTED_DOC);
+		
+		FragmentManager fragmentManager = getFragmentManager();
 		
 		// new async thread start
 		TableLayout tl = (TableLayout) findViewById(R.id.forms_table);
@@ -140,7 +149,7 @@ public class DsiplayMessageActivity extends Activity {
 			getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -194,7 +203,7 @@ public class DsiplayMessageActivity extends Activity {
 						TableLayout.LayoutParams tlayout1 = new TableLayout.LayoutParams(
 								TableLayout.LayoutParams.WRAP_CONTENT,
 								TableLayout.LayoutParams.WRAP_CONTENT);
-						tlayout1.setMargins(20, 10, 20, 10);
+						tlayout1.setMargins(10, 10, 10, 10);
 						TableRow.LayoutParams trowlayout = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
 								TableRow.LayoutParams.WRAP_CONTENT, 
 								1f);
@@ -232,6 +241,7 @@ public class DsiplayMessageActivity extends Activity {
 									tv1.setTextColor(Color.BLACK);
 								}
 								tv1.setPadding(10, 5, 10, 5);
+								
 								tv1.setTextIsSelectable(true);
 
 								trow1.addView(tv1);
@@ -258,7 +268,7 @@ public class DsiplayMessageActivity extends Activity {
 						tv0.setGravity(Gravity.CENTER_HORIZONTAL);
 						tv0.setWidth(mDisplayMetrics.widthPixels);
 						if(message[i].popData().isHeader()){
-							tv0.setTextColor(Color.GREEN);
+							tv0.setTextColor(Color.BLUE);
 						} else {
 							tv0.setTextColor(Color.BLACK);
 						}
@@ -336,19 +346,14 @@ public class DsiplayMessageActivity extends Activity {
 	
 	private View.OnLongClickListener listener = new View.OnLongClickListener() {
 	    public boolean onLongClick(View v) {
+	    	boolean header = false;
 	        TextView clickedWord = (TextView) v;
-	        //clickedWord.sets
 	        DefinitionData def = (DefinitionData) clickedWord.getTag();
-	        Toast.makeText(DsiplayMessageActivity.this, def.getProcessedData(), Toast.LENGTH_LONG).show();
-	        //showPopup(DsiplayMessageActivity.this, v);
-	        
-	       
+	        //Toast.makeText(DsiplayMessageActivity.this, def.getProcessedData(), Toast.LENGTH_LONG).show();
 	        
 	        int[] location = new int[2];  
             //clickedWord.getLocationOnScreen(location);
             v.getLocationInWindow(location);
-            
-            
 
             Point point = new Point();
             point.x = location[0];
@@ -356,23 +361,35 @@ public class DsiplayMessageActivity extends Activity {
 	        
             //Toast.makeText(DsiplayMessageActivity.this, point.toString(), Toast.LENGTH_LONG).show();
             
-	       showPopup(DsiplayMessageActivity.this, point, v);
+            if(def.isHeader()){
+            	// use different popup
+            	header = true;
+            }
+            showPopup(DsiplayMessageActivity.this, point, v, header);
+	       
 	        return true;
 	    }
 	};
 	
-	@SuppressWarnings("deprecation")
-	private void showPopup(Activity context, Point p, View v) {
-		
-		LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.popup_window);
+	private void showPopup(Activity context, Point p, View v, boolean h) {
+		int layoutID;
+		if(h){
+			layoutID = R.layout.popup_window_header;
+		} else {
+			layoutID = R.layout.popup_window;
+		}
+		//LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.popup_window);
 		LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View layout = layoutInflater.inflate(R.layout.popup_window, null);
-		
+		View layout = layoutInflater.inflate(layoutID, null);
+	    layout.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), 
+	            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+	    
 		DisplayMetrics mDisplayMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
 		
 	    PopupWindow popup = new PopupWindow(context);
 	    
+	    layout.setTag(v);
 	    popup.setContentView(layout);
 	    popup.setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
 	    popup.setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -386,12 +403,16 @@ public class DsiplayMessageActivity extends Activity {
 	    } else { 
 	    	if(p.x <= (mDisplayMetrics.widthPixels/7)*1) {
 	    	layout.setBackgroundResource(R.drawable.balloon_left);
-	    }	else{
-		    OFFSET_X = -120; // use other constant here to center
-	    }
+	    	} else{
+	    		//OFFSET_X = -120; // use other constant here to center
+	    		OFFSET_X = (int)-((layout.getMeasuredWidth() - v.getWidth()) / 2) ;
+	    		}
 	    }
 	    
-	    popup.setBackgroundDrawable(new BitmapDrawable());
+	    Bitmap bg = getResizedBitmap(((BitmapDrawable)layout.getBackground()).getBitmap(), layout.getMeasuredHeight(), layout.getMeasuredWidth());
+	    
+	    popup.setBackgroundDrawable(new BitmapDrawable(getResources(), bg));
+
 
 	    popup.showAtLocation(layout, Gravity.NO_GRAVITY, p.x + OFFSET_X, p.y + OFFSET_Y);
 	    
@@ -399,5 +420,100 @@ public class DsiplayMessageActivity extends Activity {
 	    MenuInflater inflater = popup.getMenuInflater();
 	    inflater.inflate(R.menu.definition_popup, popup.getMenu());
 	    popup.show();*/
+	}
+	
+	public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth)
+	{
+	    int width = bm.getWidth();
+	    int height = bm.getHeight();
+	    float scaleWidth = ((float) newWidth) / width;
+	    float scaleHeight = ((float) newHeight) / height;
+	    // create a matrix for the manipulation
+	    Matrix matrix = new Matrix();
+	    // resize the bit map
+	    matrix.postScale(scaleWidth, scaleHeight);
+	    // recreate the new Bitmap
+	    Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+	    return resizedBitmap;
+	}
+	
+	public void copyToClipboard(View v) {
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		
+		LinearLayout popup = (LinearLayout) v.getParent();
+		TextView clickedWord = (TextView) popup.getTag();
+		DefinitionData dd = (DefinitionData) clickedWord.getTag();
+		String copy = dd.getData();
+		
+		android.content.ClipData clip = android.content.ClipData.newPlainText(copy, copy);
+		clipboard.setPrimaryClip(clip);
+		
+		toast(getResources().getString(R.string.popup_copy));
+	}
+	
+	public void lookupDictionary(View v) {
+		toast(getResources().getString(R.string.popup_dictionary));
+	}
+	
+	public void lookupSearch(View v) {
+		toast(getResources().getString(R.string.popup_search));
+		
+		LinearLayout popup = (LinearLayout) v.getParent();
+		TextView clickedWord = (TextView) popup.getTag();
+		TableRow row = (TableRow) clickedWord.getParent();
+		TableLayout table = (TableLayout) row.getParent();
+		TableRow toprow = (TableRow) table.getChildAt(0);
+		
+		
+		DefinitionData dd = (DefinitionData) clickedWord.getTag();
+		DefinitionData rd = (DefinitionData) row.getChildAt(0).getTag();
+		DefinitionData cd = (DefinitionData) toprow.getChildAt(row.indexOfChild(clickedWord)).getTag();
+		
+		String search = dd.getProcessedData();
+		SearchContextDialog lookup = new SearchContextDialog();
+		lookup.setSearch(search);
+		
+		if (dd.isHeader()){
+			lookup.setHeader(true);
+		} else {
+			String rowLabel = "";
+			String columnLabel = "";
+			if(rd.isHeader()){
+				rowLabel = rd.getData() + ", ";
+			}
+			if(cd.isHeader()){
+				columnLabel = cd.getData();
+			}
+			
+			lookup.setGrammar(rowLabel + columnLabel);
+		}
+		
+		
+		DialogFragment newFragment = lookup;
+	    newFragment.show(getFragmentManager(), "context");
+	}
+	
+	public void shareMenu(View v) {
+		//toast(getResources().getString(R.string.popup_share));
+		
+		LinearLayout popup = (LinearLayout) v.getParent();
+		TextView clickedWord = (TextView) popup.getTag();
+		DefinitionData dd = (DefinitionData) clickedWord.getTag();
+		String share = dd.getProcessedData();
+		
+		Intent intent = new Intent(); intent.setAction(Intent.ACTION_SEND);
+		intent.setType("text/plain");
+		intent.putExtra(Intent.EXTRA_TEXT, share);  
+		startActivity(Intent.createChooser(intent, "Share via"));
+	}
+	
+	public void pronounceWord(View v) {
+		toast(getResources().getString(R.string.popup_pronounce));
+	}
+	
+	
+	// debug methods
+	public void toast(String s){
+		Toast.makeText(DsiplayMessageActivity.this, s, Toast.LENGTH_LONG).show();
 	}
 }

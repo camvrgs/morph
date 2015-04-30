@@ -277,7 +277,7 @@ public class MainActivity extends Activity {
 	}
 
 	private void processMessage(String str) {
-		String destUrl = URL_DEST + urlReplace(str);
+		String destUrl = URL_DEST + urlReplace(str.trim());
 		new urlParseThread().execute(destUrl);
 	}
 

@@ -10,8 +10,14 @@
     <string name="title_activity_dsiplay_message">Query Result</string>
     <string name="info">Built using The Tower of Babel project\'s etymological and morphalogical database tools.\nFind more here: http://starling.rinet.ru/</string>
 	
-    <string name="popup_copy">Copy</string>
+    <string name="popup_copy">Copied to Clipboard</string>
     <string name="popup_dictionary">Dictionary</string>
-    <string name="popup_search">Search</string>
+    <string name="popup_search">Search Context</string>
+        <string name="back">Back</string>
+        <string name="open_browser">Open in Browser</string>
+        
+    <string name="popup_share">Share</string>
+    <string name="popup_pronounce">Pronounce</string>
+    
     
 </resources>

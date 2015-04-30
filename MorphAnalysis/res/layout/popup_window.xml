@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/popup_window"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:background="@drawable/balloon"
+    android:orientation="horizontal" 
+    android:padding="5dp"
+    android:gravity="center"
+    >
+    
+    
+    <ImageView
+    android:id="@+id/popup_copy"
+    android:layout_margin="5dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:contentDescription="@string/popup_copy"
+    android:src="@drawable/ic_action_copy"
+    android:onClick="copyToClipboard"
+    />
+    
+    <ImageView
+    android:id="@+id/popup_share"
+    android:layout_margin="5dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:contentDescription="@string/popup_share"
+    android:src="@drawable/ic_action_share"
+    android:onClick="shareMenu"
+    />
+    
+    <ImageView
+    android:id="@+id/popup_dictionary"
+    android:layout_margin="5dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:contentDescription="@string/popup_dictionary"
+    android:src="@drawable/ic_action_book"
+    android:onClick="lookupDictionary"
+    
+    android:visibility="gone"
+    />
+    
+    <ImageView
+    android:id="@+id/popup_search"
+    android:layout_margin="5dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:contentDescription="@string/popup_search"
+    android:src="@drawable/ic_action_search"
+    android:onClick="lookupSearch"
+    />
+    
+    <ImageView
+    android:id="@+id/popup_pronounce"
+    android:layout_margin="5dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:contentDescription="@string/popup_pronounce"
+    android:src="@drawable/ic_action_play"
+    android:onClick="pronounceWord"
+    />
+
+</LinearLayout>

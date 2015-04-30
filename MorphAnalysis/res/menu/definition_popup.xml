@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+    <item
+        android:id="@+id/popup_copy"
+        android:orderInCategory="1"
+        android:showAsAction="never"
+        android:title="@string/popup_copy"
+        android:icon="@drawable/ic_action_copy"
+        />
+    
+    <item
+        android:id="@+id/popup_dictionary"
+        android:orderInCategory="2"
+        android:showAsAction="never"
+        android:title="@string/popup_dictionary"
+        android:icon="@drawable/ic_action_book"/>
+    
+    <item
+        android:id="@+id/popup_search"
+        android:orderInCategory="3"
+        android:showAsAction="never"
+        android:title="@string/popup_search"
+        android:icon="@drawable/ic_action_search"/>
+
+</menu>
